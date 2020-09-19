@@ -3,6 +3,7 @@ import csv
 import math
 from random import shuffle
 
+
 class DataSet:
     classes: dict
     classes_relative_frequencies: dict
@@ -52,7 +53,7 @@ class DataSet:
                 values_dict[example[prop_index]] = values_dict.setdefault(example[prop_index], 0) + 1
 
             for prop_value, count in values_dict.items():
-                values_dict[prop_value] = (count) / (len(self.examples) )
+                values_dict[prop_value] = (count) / (len(self.examples))
 
     def subset(self, attr: str, attr_val: str):
         example_subset = [ex for ex in self.examples if ex[self.properties[attr]] == attr_val]
@@ -74,6 +75,15 @@ class DataSet:
                 self.classes_relative_frequencies[class_name])
 
         return -acum
+
+    def most_frequent_class(self):
+        most_common_class = None
+        most_common_class_freq = 0
+        for class_name, class_rel_freq in self.classes_relative_frequencies.items():
+            if class_rel_freq >= most_common_class_freq:
+                most_common_class_freq = class_rel_freq
+                most_common_class = class_name
+        return most_common_class
 
     @classmethod
     def build_train_test_set_from_csv(cls, csv_path: str, separator: str, class_param_index: int,
