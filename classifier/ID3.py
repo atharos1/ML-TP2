@@ -1,6 +1,6 @@
 from classifier.DataSet import DataSet
-import numpy as np
 
+# TODO que pasa si entreno con un conjunto que tiene dias soleados y lluviosos, pero no nublados, y en el test set viene un día nublado?
 
 class ID3Tree:
     decision_class: str
@@ -20,7 +20,7 @@ class ID3Tree:
         best_gain_prop = None
         best_gain_prop_val = 0
         for prop, prop_index in train_data.properties.items():
-            if prop_index == train_data.class_param_index or prop in ignored_props:
+            if prop == train_data.classification_prop or prop in ignored_props:
                 continue
 
             prop_gain = train_data.gain(prop)
@@ -60,6 +60,6 @@ class ID3Tree:
 
         for example in test_set.examples:
             processed_result = self.classify_example(example, test_set)
-            confusion_matrix[example[test_set.class_param_index]][processed_result] += 1
+            confusion_matrix[example[test_set.properties[test_set.classification_prop]]][processed_result] += 1
 
         return confusion_matrix

@@ -9,22 +9,21 @@ class DataSet:
     classes_relative_frequencies: dict
     examples: list
     properties: dict
-    class_param_index: int
+    classification_prop: str
     props_possible_values: list  # lista de propiedades, contiene diccionarios con frecuencias relativas de cada posible valor
 
-    def __init__(self, examples: list, properties: dict, class_param_index: int = None):
+    def __init__(self, examples: list, properties: dict, classification_prop: str = None):
         self.examples = examples
         self.properties = properties
-        self.class_param_index = class_param_index
-
+        self.classification_prop = classification_prop
         self.classes = {}
         self.classes_relative_frequencies = {}
 
-        if class_param_index is not None:
+        if classification_prop is not None:
             class_list_tmp = {}
 
             for example in examples:
-                class_list_tmp.setdefault(example[class_param_index], []).append(example)
+                class_list_tmp.setdefault(example[self.properties[self.classification_prop]], []).append(example)
 
             for class_name in class_list_tmp.keys():
                 self.classes[class_name] = DataSet(class_list_tmp[class_name], properties)
@@ -57,7 +56,7 @@ class DataSet:
 
     def subset(self, attr: str, attr_val: str):
         example_subset = [ex for ex in self.examples if ex[self.properties[attr]] == attr_val]
-        return DataSet(example_subset, self.properties, self.class_param_index)
+        return DataSet(example_subset, self.properties, self.classification_prop)
 
     def gain(self, attr: str):
         acum = self.entropy()
@@ -86,7 +85,7 @@ class DataSet:
         return most_common_class
 
     @classmethod
-    def build_train_test_set_from_csv(cls, csv_path: str, separator: str, class_param_index: int,
+    def build_train_test_set_from_csv(cls, csv_path: str, separator: str, classification_prop: str,
                                       train_set_percentage: int):
         examples = []
         properties = {}
@@ -108,6 +107,6 @@ class DataSet:
         train_set_size = int(train_set_percentage * len(examples))
 
         return (
-            cls(examples[:train_set_size], properties, class_param_index),
-            cls(examples[train_set_size:], properties, class_param_index),
+            cls(examples[:train_set_size], properties, classification_prop),
+            cls(examples[train_set_size:], properties, classification_prop),
         )
