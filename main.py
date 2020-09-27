@@ -23,7 +23,7 @@ if __name__ == '__main__':
     test_set: DataSet
 
     # train_set, test_set = DataSet.build_train_test_set_from_csv("data/titanic.csv", "\t", "survived", 0.7)
-    train_set, test_set = DataSet.build_train_test_set_from_csv("data/tennis.csv", ";", "juega", 0.7)
+    train_set, test_set = DataSet.build_train_test_set_from_csv("data/tennis.csv", ";", "juega", 1)
 
     full_class_list = {**train_set.classes, **test_set.classes}.keys()
 
@@ -31,4 +31,6 @@ if __name__ == '__main__':
     ignored_props_set.add("dia")
 
     tree = ID3Tree(train_set, ignored_props=ignored_props_set)
-    print_table(tree.confusion_matrix(test_set, full_class_list))
+    # print_table(tree.confusion_matrix(test_set, full_class_list))
+
+    tree.print()

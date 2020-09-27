@@ -1,5 +1,6 @@
 from classifier.DataSet import DataSet
 
+
 # TODO que pasa si entreno con un conjunto que tiene dias soleados y lluviosos, pero no nublados, y en el test set viene un día nublado?
 
 class ID3Tree:
@@ -40,6 +41,20 @@ class ID3Tree:
         ignored_props_updated.add(self.attr)
         for attr_val in train_data.props_possible_values[train_data.properties[self.attr]].keys():
             self.children[attr_val] = ID3Tree(train_data.subset(self.attr, attr_val), train_data, ignored_props_updated)
+
+    def print(self, level: int = 0):
+        print('\t' * level, end='')
+
+        if self.decision_class is not None:
+            print("{[(" + self.decision_class + ")]}")
+            return
+
+        print(self.attr.upper())
+        level += 1
+        for attr_val, child_tree in self.children.items():
+            print('\t' * level, end='')
+            print(attr_val)
+            child_tree.print(level + 1)
 
     def classify_example(self, example: list, structure_dataset: DataSet):
         if self.decision_class is not None:
