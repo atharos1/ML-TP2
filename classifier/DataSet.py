@@ -86,7 +86,7 @@ class DataSet:
 
     @classmethod
     def build_train_test_set_from_csv(cls, csv_path: str, separator: str, classification_prop: str,
-                                      train_set_percentage: int):
+                                      train_set_percentage: int, discretizations_dict: dict = {}, randomize_sets: bool = True):
         examples = []
         properties = {}
 
@@ -97,12 +97,18 @@ class DataSet:
                 line_count += 1
                 if line_count == 1:
                     for prop_index in range(len(row)):
-                        properties[row[prop_index]] = prop_index
+                        properties[row[prop_index].upper()] = prop_index
                     continue
+
+                for discretized_prop_name, discretization_function in discretizations_dict.items():
+                    row[properties[discretized_prop_name]] = discretization_function(row[properties[discretized_prop_name]])
 
                 examples.append(row)
 
-        shuffle(examples)
+        classification_prop = classification_prop.upper()
+
+        if randomize_sets:
+            shuffle(examples)
 
         train_set_size = int(train_set_percentage * len(examples))
 
