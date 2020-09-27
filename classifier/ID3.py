@@ -7,6 +7,7 @@ class ID3Tree:
     decision_class: str
     attr: str
     children: dict  # Valor del atributo - nodo hijo / nombre de clase (decisión)
+    train_data: DataSet
 
     def __init__(self, train_data: DataSet, parent_train_data: DataSet = None, ignored_props: set = set()):
         for class_name, class_rel_freq in train_data.classes_relative_frequencies.items():
@@ -17,6 +18,8 @@ class ID3Tree:
         if len(train_data.examples) == 0:
             self.decision_class = parent_train_data.most_frequent_class
             return
+
+        self.train_data = train_data
 
         best_gain_prop = None
         best_gain_prop_val = 0
@@ -59,6 +62,10 @@ class ID3Tree:
     def classify_example(self, example: list, structure_dataset: DataSet):
         if self.decision_class is not None:
             return self.decision_class
+
+        # TODO chequear que se hace así
+        if example[structure_dataset.properties[self.attr]] not in self.children.keys():
+            return self.train_data.most_frequent_class()
 
         return self.children[example[structure_dataset.properties[self.attr]]].classify_example(example,
                                                                                                 structure_dataset)
