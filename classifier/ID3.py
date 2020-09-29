@@ -45,7 +45,7 @@ class ID3Tree:
         ignored_props_updated = ignored_props.copy()
         ignored_props_updated.add(self.attr)
         for attr_val in train_data.props_possible_values[train_data.properties[self.attr]].keys():
-            self.children[attr_val] = ID3Tree(train_data.subset(self.attr, attr_val), train_data, ignored_props_updated)
+            self.children[attr_val] = ID3Tree(train_data.attr_val_subset(self.attr, attr_val), train_data, ignored_props_updated)
         ignored_props_updated.remove(self.attr)
 
         max_child_depth = 0
@@ -135,3 +135,17 @@ class ID3Tree:
         plt.ylabel('Success rate')
         plt.legend(loc='upper left')
         plt.show()
+
+    @staticmethod
+    def build_by_random_forest(train_set: DataSet, test_set: DataSet, trees_to_consider: int, ignored_props: set = set()):
+        best_success_rate = 0
+        best_tree: ID3Tree = None
+
+        for curr_tree_num in range(trees_to_consider):
+            curr_tree = ID3Tree(train_set.subset(len(train_set.examples), True), ignored_props=ignored_props)
+            _, _, _, success_rate = curr_tree.classify_set(test_set)
+            if success_rate >= best_success_rate:
+                best_success_rate = success_rate
+                best_tree = curr_tree
+
+        return best_tree

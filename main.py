@@ -1,3 +1,5 @@
+import math
+
 from classifier.DataSet import DataSet
 from classifier.ID3 import ID3Tree
 
@@ -41,12 +43,12 @@ if __name__ == '__main__':
     ignored_props_set.add("Ticket".upper())
     ignored_props_set.add("Cabin".upper())
 
-    tree = ID3Tree(train_set, ignored_props=ignored_props_set)
+    tree = ID3Tree.build_by_random_forest(train_set, test_set, 20, ignored_props_set)
+
+    # tree = ID3Tree(train_set, ignored_props=ignored_props_set)
     print_table(tree.confusion_matrix(test_set))
 
-    results, successes, errors, success_rate = tree.classify_set(test_set)
-    print(
-        f"Classified {len(test_set.examples)} examples.\n{successes} successes, {errors} misses, {round(success_rate * 100, 2)}% success rate")
+
     # for result in results:
     #     print(result)
 

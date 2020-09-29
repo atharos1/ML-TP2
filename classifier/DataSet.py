@@ -1,7 +1,7 @@
 import copy
 import csv
 import math
-from random import shuffle
+from random import shuffle, randrange
 
 
 class DataSet:
@@ -54,7 +54,18 @@ class DataSet:
             for prop_value, count in values_dict.items():
                 values_dict[prop_value] = (count) / (len(self.examples))
 
-    def subset(self, attr: str, attr_val: str):
+    def subset(self, examples_number: int, with_replacement: bool = False):
+        random_set = set()
+        examples_subset = []
+        while len(examples_subset) < examples_number:
+            number = randrange(0, len(self.examples))
+            if with_replacement or number not in random_set:
+                random_set.add(number)
+                examples_subset.append(self.examples[number])
+
+        return DataSet(examples_subset, self.properties, self.classification_prop)
+
+    def attr_val_subset(self, attr: str, attr_val: str):
         example_subset = [ex for ex in self.examples if ex[self.properties[attr]] == attr_val]
         return DataSet(example_subset, self.properties, self.classification_prop)
 
@@ -62,7 +73,7 @@ class DataSet:
         acum = self.entropy()
 
         for attr_val in self.props_possible_values[self.properties[attr]].keys():
-            subset = self.subset(attr, attr_val)
+            subset = self.attr_val_subset(attr, attr_val)
             acum -= (len(subset.examples) / len(self.examples)) * subset.entropy()
 
         return acum
@@ -86,7 +97,8 @@ class DataSet:
 
     @classmethod
     def build_train_test_set_from_csv(cls, csv_path: str, separator: str, classification_prop: str,
-                                      train_set_percentage: int, discretizations_dict: dict = {}, randomize_sets: bool = True):
+                                      train_set_percentage: int, discretizations_dict: dict = {},
+                                      randomize_sets: bool = True):
         examples = []
         properties = {}
 
@@ -101,7 +113,8 @@ class DataSet:
                     continue
 
                 for discretized_prop_name, discretization_function in discretizations_dict.items():
-                    row[properties[discretized_prop_name]] = discretization_function(row[properties[discretized_prop_name]])
+                    row[properties[discretized_prop_name]] = discretization_function(
+                        row[properties[discretized_prop_name]])
 
                 examples.append(row)
 
