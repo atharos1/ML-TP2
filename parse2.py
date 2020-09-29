@@ -1,4 +1,5 @@
 from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
 import numpy as np
 
 f = open("./data/reviews_sentiment.csv", encoding='utf-8')
@@ -31,16 +32,16 @@ while line != '\n' and line != '':
     X.append(reg)
     line = f.readline()
 
-# 4 samples/observations and 2 variables/features
 X = np.array(X)
-# the scaler object (model)
-scaler = StandardScaler()
-# fit and transform the data
-scaled_data = scaler.fit_transform(X) 
+#scaler = StandardScaler()
+#scaled_data = scaler.fit_transform(X)
+#imp = SimpleImputer(strategy="mean")
+#imputed_data = imp.fit_transform(scaled_data)
+#print(scaled_data)
 
 outF = open("reviews_sentiment_fixed.csv", "w")
 idx = 0
-for reg in scaled_data:
+for reg in X:
     for value in reg:
         outF.write(str(value))
         outF.write(";")

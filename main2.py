@@ -18,6 +18,7 @@ if __name__ == '__main__':
     discretizations_dict["textSentiment".upper()] = lambda val: float(val)
     discretizations_dict["sentimentValue".upper()] = lambda val: float(val)
 
-    train_set, test_set = DataSet.build_train_test_set_from_csv("data/reviews_sentiment_fixed.csv", ";", "Star Rating".upper(), 0.7, discretizations_dict, True)
-    knn = KNN(train_set, distance)
+    train_set, test_set = DataSet.build_train_test_set_from_csv("data/reviews_sentiment_fixed.csv", ";", "Star Rating".upper(), 0.8, discretizations_dict, True)
+    ignored_props = {"textSentiment".upper(), "titleSentiment".upper()}
+    knn = KNN(train_set, distance, ignored_props)
     knn.classify(test_set, 5, False)

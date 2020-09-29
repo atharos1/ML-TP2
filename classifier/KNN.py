@@ -1,19 +1,30 @@
 from classifier.DataSet import DataSet
+from sklearn.preprocessing import StandardScaler
 
 class KNN:
     distance_function: callable
     train_data: DataSet
 
-    def __init__(self, train_data: DataSet, distance_function: callable):
+    def __init__(self, train_data: DataSet, distance_function: callable, ignored_props: set = set()):
         self.train_data = train_data
         self.distance_function = distance_function
+        self.ignored_props = ignored_props
+        self.X_raw = []
+        self.Y = []
+        for example in train_data.examples:
+            prop_values, class_value = self.__split(example)
+            self.X_raw.append(prop_values)
+            self.Y.append(class_value)
+        self.scaler = StandardScaler().fit(self.X_raw)
+        self.X = self.scaler.transform(self.X_raw).tolist()
 
     def __split(self, example: list):
         prop_values = []
         class_value = None
         for prop in self.train_data.properties:
             if prop != self.train_data.classification_prop:
-                prop_values.append(example[self.train_data.properties[prop]])
+                if prop not in self.ignored_props:
+                    prop_values.append(example[self.train_data.properties[prop]])
             else:
                 class_value = example[self.train_data.properties[prop]]
         return prop_values, class_value
@@ -42,14 +53,13 @@ class KNN:
             return None
         else:
             return max_props[0]
-        
 
     def classify_example(self, example: list, k: int, weighted: bool):
+        example = self.scaler.transform([example]).tolist()[0]
         distances = []
-        for element in self.train_data.examples:
-            prop_values, class_value = self.__split(element)
-            d = self.distance_function(example, prop_values)
-            distances.append((d, class_value))
+        for i in range(len(self.X)):
+            d = self.distance_function(example, self.X[i])
+            distances.append((d, self.Y[i]))
         distances.sort(key=lambda x: x[0])
         distances = distances[:k]
         return self.__find_nearest(distances, weighted)
